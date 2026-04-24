@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+# =========================
+# PAGE CONFIG
+# =========================
 st.set_page_config(page_title="Nassau Dashboard", layout="wide")
 
 st.title("🍬 Nassau Candy - Profitability Dashboard")
@@ -33,7 +36,7 @@ df["Profit Contribution"] = df["Gross Profit"] / total_profit
 # =========================
 # SIDEBAR FILTERS
 # =========================
-st.sidebar.header("Filters")
+st.sidebar.header("🔍 Filters")
 
 division = st.sidebar.multiselect(
     "Select Division",
@@ -51,7 +54,7 @@ margin_filter = st.sidebar.slider(
 filtered_df = df[
     (df["Division"].isin(division)) &
     (df["Gross Margin (%)"] >= margin_filter)
-]
+].copy()
 
 if product_search:
     filtered_df = filtered_df[
@@ -61,24 +64,18 @@ if product_search:
 # =========================
 # KPI CARDS
 # =========================
+st.subheader("📊 Key Metrics")
+
 col1, col2, col3 = st.columns(3)
 
-col1.metric("Total Sales", f"{total_sales:,.0f}")
-col2.metric("Total Profit", f"{total_profit:,.0f}")
-col3.metric("Avg Margin", f"{df['Gross Margin (%)'].mean():.2f}%")
+col1.metric("Total Sales", f"{filtered_df['Sales'].sum():,.0f}")
+col2.metric("Total Profit", f"{filtered_df['Gross Profit'].sum():,.0f}")
+col3.metric("Avg Margin", f"{filtered_df['Gross Margin (%)'].mean():.2f}%")
 
 # =========================
-# PRODUCT CLASSIFICATION (IMPORTANT)
+# PRODUCT CLASSIFICATION
 # =========================
 st.subheader("📊 Product Performance Classification")
-
-conditions = [
-    (filtered_df["Gross Margin (%)"] > 40),
-    (filtered_df["Gross Margin (%)"] <= 40) & (filtered_df["Gross Margin (%)"] > 15),
-    (filtered_df["Gross Margin (%)"] <= 15)
-]
-
-labels = ["High Profit", "Medium", "Low Profit"]
 
 filtered_df["Category"] = pd.cut(
     filtered_df["Gross Margin (%)"],
@@ -90,7 +87,8 @@ fig0 = px.histogram(
     filtered_df,
     x="Category",
     color="Category",
-    title="Product Classification by Margin"
+    title="Product Classification by Margin",
+    template="plotly_dark"
 )
 
 st.plotly_chart(fig0, use_container_width=True)
@@ -98,15 +96,32 @@ st.plotly_chart(fig0, use_container_width=True)
 # =========================
 # TOP PRODUCTS
 # =========================
-st.subheader("🏆 Top Products by Profit")
+st.markdown("### 📊 Top Performing Products")
 
-top_products = filtered_df.groupby("Product Name")["Gross Profit"].sum().sort_values(ascending=False).head(10)
+top_products = (
+    filtered_df.groupby("Product Name")["Gross Profit"]
+    .sum()
+    .sort_values(ascending=False)
+    .head(10)
+    .reset_index()
+)
 
 fig1 = px.bar(
     top_products,
-    x=top_products.values,
-    y=top_products.index,
-    orientation='h'
+    x="Gross Profit",
+    y="Product Name",
+    color="Gross Profit",
+    color_continuous_scale="greens",
+    orientation="h",
+    template="plotly_dark"
+)
+
+fig1.update_yaxes(categoryorder="total ascending")
+
+fig1.update_layout(
+    title="Top 10 Products by Profit",
+    height=500,
+    margin=dict(l=20, r=20, t=50, b=20)
 )
 
 st.plotly_chart(fig1, use_container_width=True)
@@ -126,7 +141,9 @@ fig2 = px.bar(
     division_data,
     x="Division",
     y="Gross Margin (%)",
-    title="Average Margin by Division"
+    color="Division",
+    title="Average Margin by Division",
+    template="plotly_dark"
 )
 
 st.plotly_chart(fig2, use_container_width=True)
@@ -142,7 +159,9 @@ fig3 = px.scatter(
     y="Sales",
     color="Division",
     size="Gross Profit",
-    hover_data=["Product Name"]
+    hover_data=["Product Name"],
+    title="Cost vs Sales Analysis",
+    template="plotly_dark"
 )
 
 st.plotly_chart(fig3, use_container_width=True)
@@ -152,10 +171,23 @@ st.plotly_chart(fig3, use_container_width=True)
 # =========================
 st.subheader("📈 Profit Contribution (Pareto)")
 
-pareto = filtered_df.groupby("Product Name")["Gross Profit"].sum().sort_values(ascending=False)
-pareto_df = pareto.cumsum() / pareto.sum()
+pareto = (
+    filtered_df.groupby("Product Name")["Gross Profit"]
+    .sum()
+    .sort_values(ascending=False)
+)
 
-fig4 = px.line(pareto_df)
+pareto_df = (pareto.cumsum() / pareto.sum()).reset_index()
+pareto_df.columns = ["Product Name", "Cumulative Profit"]
+
+fig4 = px.line(
+    pareto_df,
+    x="Product Name",
+    y="Cumulative Profit",
+    markers=True,
+    title="Cumulative Profit Contribution",
+    template="plotly_dark"
+)
 
 st.plotly_chart(fig4, use_container_width=True)
 
@@ -168,4 +200,7 @@ risk_df = filtered_df[filtered_df["Gross Margin (%)"] < 15][
     ["Product Name", "Sales", "Cost", "Gross Profit", "Gross Margin (%)"]
 ]
 
-st.dataframe(risk_df.sort_values(by="Gross Margin (%)"))
+st.dataframe(
+    risk_df.sort_values(by="Gross Margin (%)"),
+    use_container_width=True
+)
