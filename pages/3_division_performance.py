@@ -5,9 +5,9 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from data_processing import (
     load_data,
-    calculate_metrics,
     apply_filters
 )
 
@@ -21,8 +21,7 @@ st.title("🏢 Division Performance Dashboard")
 # -----------------------------
 # LOAD DATA
 # -----------------------------
-df = load_data("master.csv")
-df = calculate_metrics(df)
+df = load_data("Nassau.csv")
 
 # -----------------------------
 # SIDEBAR FILTERS
@@ -32,13 +31,13 @@ st.sidebar.header("Filters")
 division = st.sidebar.multiselect(
     "Select Division",
     df["Division"].unique(),
-    default=df["Division"].unique()
+    default=list(df["Division"].unique())
 )
 
 margin_threshold = st.sidebar.slider(
     "Minimum Margin (%)",
     0, 100, 0
-)
+) / 100
 
 # Apply filters
 filtered_df = apply_filters(
@@ -66,8 +65,8 @@ st.subheader("📌 Division KPIs")
 
 col1, col2, col3 = st.columns(3)
 
-col1.metric("Total Sales", f"{division_df['Sales'].sum():,.0f}")
-col2.metric("Total Profit", f"{division_df['Profit'].sum():,.0f}")
+col1.metric("Total Sales", f"${division_df['Sales'].sum():,.0f}")
+col2.metric("Total Profit", f"${division_df['Profit'].sum():,.0f}")
 col3.metric("Avg Margin", f"{division_df['Margin %'].mean():.2f}%")
 
 st.markdown("---")
@@ -111,4 +110,7 @@ st.markdown("---")
 # -----------------------------
 st.subheader("📋 Division Summary Table")
 
-st.dataframe(division_df.sort_values(by="Profit", ascending=False))
+if division_df.empty:
+    st.info("No data available with current filters.")
+else:
+    st.dataframe(division_df.sort_values(by="Profit", ascending=False))
