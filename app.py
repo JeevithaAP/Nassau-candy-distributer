@@ -10,186 +10,193 @@ st.set_page_config(
 )
 
 # =========================
-# CUSTOM CSS
+# CUSTOM CSS - Clean & Light
 # =========================
 st.markdown("""
     <style>
-    /* Background */
+
+    /* Clean white background */
     .stApp {
-        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        background-color: #f9f9f9;
     }
 
-    /* Main title */
-    .main-title {
+    /* Hero banner */
+    .hero {
+        background: linear-gradient(120deg, #1a1a2e, #16213e, #0f3460);
+        border-radius: 20px;
+        padding: 50px 40px;
         text-align: center;
-        font-size: 3em;
-        font-weight: 800;
-        background: linear-gradient(90deg, #f7971e, #ffd200);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        padding: 10px 0;
-    }
-
-    .sub-title {
-        text-align: center;
-        font-size: 1.2em;
-        color: #cccccc;
         margin-bottom: 30px;
     }
 
-    /* Feature cards */
-    .card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 24px;
-        margin: 10px 0;
-        backdrop-filter: blur(10px);
-        transition: transform 0.2s;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    .hero-title {
+        font-size: 2.8em;
+        font-weight: 900;
+        color: #FFD700;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
     }
 
-    .card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 30px rgba(255, 210, 0, 0.2);
-    }
-
-    .card-icon {
-        font-size: 2em;
-        margin-bottom: 8px;
-    }
-
-    .card-title {
+    .hero-sub {
         font-size: 1.1em;
+        color: #cccccc;
+    }
+
+    /* Section heading */
+    .section-title {
+        font-size: 1.4em;
         font-weight: 700;
-        color: #ffd200;
+        color: #1a1a2e;
+        margin: 30px 0 15px 0;
+        border-left: 5px solid #FFD700;
+        padding-left: 12px;
+    }
+
+    /* Feature cards */
+    .feat-card {
+        background: white;
+        border-radius: 14px;
+        padding: 22px 18px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        border-top: 4px solid #FFD700;
+        height: 100%;
+        transition: box-shadow 0.2s;
+    }
+
+    .feat-card:hover {
+        box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+    }
+
+    .feat-icon {
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+
+    .feat-title {
+        font-size: 1em;
+        font-weight: 700;
+        color: #1a1a2e;
         margin-bottom: 6px;
     }
 
-    .card-desc {
-        font-size: 0.9em;
-        color: #aaaaaa;
+    .feat-desc {
+        font-size: 0.88em;
+        color: #666666;
+        line-height: 1.5;
     }
 
-    /* Navigation cards */
+    /* Nav cards */
     .nav-card {
-        background: linear-gradient(135deg, rgba(247,151,30,0.15), rgba(255,210,0,0.05));
-        border: 1px solid rgba(247,151,30,0.3);
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin: 6px 0;
-        color: #ffd200;
+        background: white;
+        border: 1.5px solid #e0e0e0;
+        border-left: 5px solid #FFD700;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 8px 0;
+        font-size: 0.95em;
         font-weight: 600;
-        font-size: 1em;
-    }
-
-    /* Divider */
-    .divider {
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #ffd200, transparent);
-        margin: 30px 0;
-        border: none;
-    }
-
-    /* Footer */
-    .footer {
-        text-align: center;
-        color: #666;
-        font-size: 0.85em;
-        margin-top: 40px;
-        padding: 20px;
-        border-top: 1px solid rgba(255,255,255,0.1);
+        color: #1a1a2e;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.05);
     }
 
     /* Badge */
     .badge {
         display: inline-block;
-        background: rgba(255, 210, 0, 0.15);
-        border: 1px solid #ffd200;
-        color: #ffd200;
+        background: #1a1a2e;
+        color: #FFD700;
         border-radius: 20px;
-        padding: 4px 14px;
-        font-size: 0.8em;
+        padding: 5px 16px;
+        font-size: 0.85em;
+        font-weight: 600;
         margin: 4px;
     }
+
+    /* Footer */
+    .footer {
+        text-align: center;
+        color: #999;
+        font-size: 0.82em;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+
     </style>
 """, unsafe_allow_html=True)
 
 # =========================
 # HERO SECTION
 # =========================
-st.markdown('<div class="main-title">🍬 Nassau Candy Distributor</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Product Line Profitability & Margin Performance Dashboard</div>', unsafe_allow_html=True)
-
-st.markdown('<hr class="divider">', unsafe_allow_html=True)
+st.markdown("""
+<div class="hero">
+    <div class="hero-title">🍬 Nassau Candy Distributor</div>
+    <div class="hero-sub">Product Line Profitability & Margin Performance Dashboard</div>
+</div>
+""", unsafe_allow_html=True)
 
 # =========================
 # FEATURE CARDS
 # =========================
-st.markdown("### 📊 What This Dashboard Provides")
+st.markdown('<div class="section-title">📊 What This Dashboard Provides</div>', unsafe_allow_html=True)
 
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.markdown("""
-    <div class="card">
-        <div class="card-icon">🏆</div>
-        <div class="card-title">Product Profitability</div>
-        <div class="card-desc">Identify top and bottom performing products by profit and margin</div>
+    <div class="feat-card">
+        <div class="feat-icon">🏆</div>
+        <div class="feat-title">Product Profitability</div>
+        <div class="feat-desc">Identify top and bottom performing products by profit and margin</div>
     </div>
     """, unsafe_allow_html=True)
 
 with col2:
     st.markdown("""
-    <div class="card">
-        <div class="card-icon">🏢</div>
-        <div class="card-title">Division Performance</div>
-        <div class="card-desc">Compare revenue vs profit across all product divisions</div>
+    <div class="feat-card">
+        <div class="feat-icon">🏢</div>
+        <div class="feat-title">Division Performance</div>
+        <div class="feat-desc">Compare revenue vs profit across all product divisions</div>
     </div>
     """, unsafe_allow_html=True)
 
 with col3:
     st.markdown("""
-    <div class="card">
-        <div class="card-icon">💰</div>
-        <div class="card-title">Cost Diagnostics</div>
-        <div class="card-desc">Spot pricing inefficiencies and cost-heavy products</div>
+    <div class="feat-card">
+        <div class="feat-icon">💰</div>
+        <div class="feat-title">Cost Diagnostics</div>
+        <div class="feat-desc">Spot pricing inefficiencies and cost-heavy products</div>
     </div>
     """, unsafe_allow_html=True)
 
 with col4:
     st.markdown("""
-    <div class="card">
-        <div class="card-icon">📈</div>
-        <div class="card-title">Pareto Analysis</div>
-        <div class="card-desc">Discover which few products drive 80% of total profit</div>
+    <div class="feat-card">
+        <div class="feat-icon">📈</div>
+        <div class="feat-title">Pareto Analysis</div>
+        <div class="feat-desc">Discover which few products drive 80% of total profit</div>
     </div>
     """, unsafe_allow_html=True)
-
-st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
 # =========================
 # NAVIGATION SECTION
 # =========================
-st.markdown("### 📂 Navigate Using the Sidebar")
+st.markdown('<div class="section-title">📂 Navigate Using the Sidebar</div>', unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown('<div class="nav-card">📊 1 — Overview Dashboard</div>', unsafe_allow_html=True)
-    st.markdown('<div class="nav-card">🏆 2 — Product Analysis</div>', unsafe_allow_html=True)
-    st.markdown('<div class="nav-card">🏢 3 — Division Performance</div>', unsafe_allow_html=True)
+    st.markdown('<div class="nav-card">📊 &nbsp; 1 — Overview Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="nav-card">🏆 &nbsp; 2 — Product Analysis</div>', unsafe_allow_html=True)
+    st.markdown('<div class="nav-card">🏢 &nbsp; 3 — Division Performance</div>', unsafe_allow_html=True)
 
 with col2:
-    st.markdown('<div class="nav-card">💰 4 — Cost Diagnostics</div>', unsafe_allow_html=True)
-    st.markdown('<div class="nav-card">📈 5 — Profit Concentration</div>', unsafe_allow_html=True)
-
-st.markdown('<hr class="divider">', unsafe_allow_html=True)
+    st.markdown('<div class="nav-card">💰 &nbsp; 4 — Cost Diagnostics</div>', unsafe_allow_html=True)
+    st.markdown('<div class="nav-card">📈 &nbsp; 5 — Profit Concentration</div>', unsafe_allow_html=True)
 
 # =========================
-# BUILT WITH SECTION
+# BUILT WITH
 # =========================
-st.markdown("### 🚀 Built With")
+st.markdown('<div class="section-title">🚀 Built With</div>', unsafe_allow_html=True)
 
 st.markdown("""
 <span class="badge">🐍 Python</span>
