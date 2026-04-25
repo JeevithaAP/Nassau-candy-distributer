@@ -17,7 +17,66 @@ from data_processing import (
 # -----------------------------
 st.set_page_config(layout="wide")
 
-st.title("🏆 Product Analysis Dashboard")
+# -----------------------------
+# CUSTOM CSS
+# -----------------------------
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #1a1a2e;
+    }
+
+    .page-header {
+        background: linear-gradient(120deg, #16213e, #0f3460);
+        border-radius: 16px;
+        padding: 30px 40px;
+        margin-bottom: 30px;
+        text-align: center;
+        border: 1px solid rgba(255,215,0,0.2);
+    }
+
+    .page-header h1 {
+        color: #FFD700;
+        font-size: 2.2em;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .page-header p {
+        color: #cccccc;
+        font-size: 1em;
+        margin-top: 6px;
+    }
+
+    .section-title {
+        font-size: 1.2em;
+        font-weight: 700;
+        color: #FFD700;
+        margin: 25px 0 12px 0;
+        border-left: 5px solid #FFD700;
+        padding-left: 12px;
+    }
+
+    .info-box {
+        background: rgba(255,215,0,0.08);
+        border: 1px solid rgba(255,215,0,0.2);
+        border-radius: 12px;
+        padding: 16px 20px;
+        color: #cccccc;
+        font-size: 0.95em;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# -----------------------------
+# PAGE HEADER
+# -----------------------------
+st.markdown("""
+<div class="page-header">
+    <h1>🏆 Product Analysis Dashboard</h1>
+    <p>Deep dive into product-level profitability and margin performance</p>
+</div>
+""", unsafe_allow_html=True)
 
 # -----------------------------
 # LOAD DATA
@@ -27,7 +86,7 @@ df = load_data("Nassau.csv")
 # -----------------------------
 # SIDEBAR FILTERS
 # -----------------------------
-st.sidebar.header("Filters")
+st.sidebar.header("🔧 Filters")
 
 division = st.sidebar.multiselect(
     "Select Division",
@@ -40,7 +99,7 @@ margin_threshold = st.sidebar.slider(
     0, 100, 0
 ) / 100
 
-product_search = st.sidebar.text_input("Search Product")
+product_search = st.sidebar.text_input("🔍 Search Product")
 
 # Apply filters
 filtered_df = apply_filters(
@@ -58,7 +117,7 @@ product_df = product_level_analysis(filtered_df)
 # -----------------------------
 # TOP PRODUCTS BY PROFIT
 # -----------------------------
-st.subheader("🏆 Top 10 Products by Profit")
+st.markdown('<div class="section-title">🏆 Top 10 Products by Profit</div>', unsafe_allow_html=True)
 
 top_profit = product_df.head(10)
 
@@ -68,10 +127,15 @@ fig1 = px.bar(
     y="Product Name",
     orientation="h",
     color="Profit",
+    color_continuous_scale="YlOrRd",
     template="plotly_dark"
 )
-
 fig1.update_yaxes(categoryorder="total ascending")
+fig1.update_layout(
+    coloraxis_showscale=False,
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)"
+)
 st.plotly_chart(fig1, use_container_width=True)
 
 st.markdown("---")
@@ -79,7 +143,7 @@ st.markdown("---")
 # -----------------------------
 # TOP PRODUCTS BY MARGIN
 # -----------------------------
-st.subheader("📈 Top Products by Margin")
+st.markdown('<div class="section-title">📈 Top Products by Gross Margin %</div>', unsafe_allow_html=True)
 
 top_margin = product_df.sort_values(by="Gross Margin %", ascending=False).head(10)
 
@@ -89,10 +153,15 @@ fig2 = px.bar(
     y="Product Name",
     orientation="h",
     color="Gross Margin %",
+    color_continuous_scale="Teal",
     template="plotly_dark"
 )
-
 fig2.update_yaxes(categoryorder="total ascending")
+fig2.update_layout(
+    coloraxis_showscale=False,
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)"
+)
 st.plotly_chart(fig2, use_container_width=True)
 
 st.markdown("---")
@@ -100,15 +169,20 @@ st.markdown("---")
 # -----------------------------
 # PRODUCT CLASSIFICATION
 # -----------------------------
-st.subheader("📊 Product Performance Classification")
+st.markdown('<div class="section-title">📊 Product Performance Classification</div>', unsafe_allow_html=True)
 
 fig3 = px.histogram(
     product_df,
     x="Category",
     color="Category",
-    template="plotly_dark"
+    template="plotly_dark",
+    color_discrete_sequence=["#FFD700", "#ff6b6b", "#4ecdc4", "#95e1d3"]
 )
-
+fig3.update_layout(
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    showlegend=False
+)
 st.plotly_chart(fig3, use_container_width=True)
 
 st.markdown("---")
@@ -116,13 +190,11 @@ st.markdown("---")
 # -----------------------------
 # HIGH SALES BUT LOW MARGIN
 # -----------------------------
-st.subheader("⚠️ High Sales but Low Margin Products")
+st.markdown('<div class="section-title">⚠️ High Sales but Low Margin Products</div>', unsafe_allow_html=True)
 
-problem_products = product_df[
-    product_df["Category"] == "High Sales but Low Margin"
-]
+problem_products = product_df[product_df["Category"] == "High Sales but Low Margin"]
 
 if problem_products.empty:
-    st.info("No high sales / low margin products found with current filters.")
+    st.markdown('<div class="info-box">✅ No high sales / low margin products found with current filters.</div>', unsafe_allow_html=True)
 else:
-    st.dataframe(problem_products)
+    st.dataframe(problem_products, use_container_width=True)
