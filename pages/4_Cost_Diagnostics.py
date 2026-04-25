@@ -61,26 +61,16 @@ cost_df = cost_structure_analysis(filtered_df)
 st.subheader("📊 Cost vs Sales Analysis")
 
 fig1 = px.scatter(
-    cost_df,
+    filtered_df,
     x="Cost",
     y="Sales",
-    size="Profit",
-    size_max=40,
-    color="Cost Heavy",
-    color_discrete_map={True: "#ff4b4b", False: "#4b9eff"},
-    hover_data=["Product Name", "Cost Ratio", "Profit"],
+    color="Division",
+    hover_data=["Product Name"],
     template="plotly_dark",
     labels={
-        "Cost": "Total Cost ($)",
-        "Sales": "Total Sales ($)",
-        "Cost Heavy": "Cost Heavy?"
+        "Cost": "Cost ($)",
+        "Sales": "Sales ($)"
     }
-)
-
-fig1.update_layout(
-    xaxis_tickprefix="$",
-    yaxis_tickprefix="$",
-    legend_title_text="Cost Heavy"
 )
 
 st.plotly_chart(fig1, use_container_width=True)
