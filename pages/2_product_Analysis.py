@@ -8,7 +8,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from data_processing import (
     load_data,
-    calculate_metrics,
     product_level_analysis,
     apply_filters
 )
@@ -23,8 +22,7 @@ st.title("🏆 Product Analysis Dashboard")
 # -----------------------------
 # LOAD DATA
 # -----------------------------
-df = load_data("master.csv")
-df = calculate_metrics(df)
+df = load_data("Nassau.csv")
 
 # -----------------------------
 # SIDEBAR FILTERS
@@ -34,13 +32,13 @@ st.sidebar.header("Filters")
 division = st.sidebar.multiselect(
     "Select Division",
     df["Division"].unique(),
-    default=df["Division"].unique()
+    default=list(df["Division"].unique())
 )
 
 margin_threshold = st.sidebar.slider(
     "Minimum Margin (%)",
     0, 100, 0
-)
+) / 100
 
 product_search = st.sidebar.text_input("Search Product")
 
@@ -74,7 +72,6 @@ fig1 = px.bar(
 )
 
 fig1.update_yaxes(categoryorder="total ascending")
-
 st.plotly_chart(fig1, use_container_width=True)
 
 st.markdown("---")
@@ -96,7 +93,6 @@ fig2 = px.bar(
 )
 
 fig2.update_yaxes(categoryorder="total ascending")
-
 st.plotly_chart(fig2, use_container_width=True)
 
 st.markdown("---")
@@ -126,4 +122,7 @@ problem_products = product_df[
     product_df["Category"] == "High Sales but Low Margin"
 ]
 
-st.dataframe(problem_products)
+if problem_products.empty:
+    st.info("No high sales / low margin products found with current filters.")
+else:
+    st.dataframe(problem_products)
