@@ -113,8 +113,12 @@ def cost_structure_analysis(df):
 
     cost_df["Cost Ratio"] = cost_df["Cost"] / cost_df["Sales"]
 
-    cost_df["Cost Heavy"] = (cost_df["Cost Ratio"] > 0.7) & (
-        cost_df["Profit"] < cost_df["Profit"].mean()
+    # Use data-driven threshold (top 40% cost ratio = cost heavy)
+    cost_ratio_threshold = cost_df["Cost Ratio"].quantile(0.6)
+
+    cost_df["Cost Heavy"] = (
+        (cost_df["Cost Ratio"] >= cost_ratio_threshold) &
+        (cost_df["Profit"] < cost_df["Profit"].mean())
     )
 
     cost_df["Low Margin"] = cost_df["Profit"] < cost_df["Profit"].mean()
@@ -124,9 +128,8 @@ def cost_structure_analysis(df):
         (cost_df["Profit"] < cost_df["Profit"].mean())
     )
 
-    # FIX: Added missing Discontinue Review column
     cost_df["Discontinue Review"] = (
-        (cost_df["Cost Ratio"] > 0.7) &
+        (cost_df["Cost Ratio"] >= cost_ratio_threshold) &
         (cost_df["Sales"] < cost_df["Sales"].mean())
     )
 
