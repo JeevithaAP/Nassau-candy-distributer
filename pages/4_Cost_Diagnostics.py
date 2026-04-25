@@ -65,9 +65,22 @@ fig1 = px.scatter(
     x="Cost",
     y="Sales",
     size="Profit",
+    size_max=40,
     color="Cost Heavy",
-    hover_data=["Product Name"],
-    template="plotly_dark"
+    color_discrete_map={True: "#ff4b4b", False: "#4b9eff"},
+    hover_data=["Product Name", "Cost Ratio", "Profit"],
+    template="plotly_dark",
+    labels={
+        "Cost": "Total Cost ($)",
+        "Sales": "Total Sales ($)",
+        "Cost Heavy": "Cost Heavy?"
+    }
+)
+
+fig1.update_layout(
+    xaxis_tickprefix="$",
+    yaxis_tickprefix="$",
+    legend_title_text="Cost Heavy"
 )
 
 st.plotly_chart(fig1, use_container_width=True)
