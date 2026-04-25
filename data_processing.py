@@ -4,7 +4,7 @@ import pandas as pd
 # ===============================
 # STEP 1: LOAD + CLEAN DATA
 # ===============================
-def load_and_clean_data():
+def load_data():
 
     try:
         df = pd.read_csv("Nassau.csv")
