@@ -8,7 +8,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from data_processing import (
     load_data,
-    calculate_metrics,
     cost_structure_analysis,
     apply_filters
 )
@@ -23,8 +22,7 @@ st.title("💰 Cost vs Margin Diagnostics Dashboard")
 # -----------------------------
 # LOAD DATA
 # -----------------------------
-df = load_data("master.csv")
-df = calculate_metrics(df)
+df = load_data("Nassau.csv")
 
 # -----------------------------
 # SIDEBAR FILTERS
@@ -34,13 +32,13 @@ st.sidebar.header("Filters")
 division = st.sidebar.multiselect(
     "Select Division",
     df["Division"].unique(),
-    default=df["Division"].unique()
+    default=list(df["Division"].unique())
 )
 
 margin_threshold = st.sidebar.slider(
     "Minimum Margin (%)",
     0, 100, 0
-)
+) / 100
 
 product_search = st.sidebar.text_input("Search Product")
 
@@ -83,7 +81,10 @@ st.subheader("⚠️ Pricing Inefficiency (High Sales but Low Profit)")
 
 pricing_issue = cost_df[cost_df["Pricing Issue"] == True]
 
-st.dataframe(pricing_issue)
+if pricing_issue.empty:
+    st.info("No pricing inefficiency products found with current filters.")
+else:
+    st.dataframe(pricing_issue)
 
 st.markdown("---")
 
@@ -94,7 +95,10 @@ st.subheader("🚨 Cost Heavy Products")
 
 cost_heavy = cost_df[cost_df["Cost Heavy"] == True]
 
-st.dataframe(cost_heavy)
+if cost_heavy.empty:
+    st.info("No cost heavy products found with current filters.")
+else:
+    st.dataframe(cost_heavy)
 
 st.markdown("---")
 
@@ -105,4 +109,7 @@ st.subheader("❌ Products for Discontinuation Review")
 
 discontinue = cost_df[cost_df["Discontinue Review"] == True]
 
-st.dataframe(discontinue)
+if discontinue.empty:
+    st.info("No products flagged for discontinuation with current filters.")
+else:
+    st.dataframe(discontinue)
