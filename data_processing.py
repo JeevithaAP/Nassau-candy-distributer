@@ -3,8 +3,8 @@ import pandas as pd
 # ======================================
 # STEP 1: LOAD + CLEAN DATA
 # ======================================
-def load_and_clean_data():
-    df = pd.read_csv("Nassau.csv")
+def load_and_clean_data(filename="Nassau.csv"):
+    df = pd.read_csv(filename)
 
     # Remove missing critical values
     df = df.dropna(subset=["Sales", "Cost"])
@@ -92,10 +92,10 @@ def pareto_analysis(df):
     pareto_df["Cumulative Profit"] = pareto_df["Profit"].cumsum()
     total_profit = pareto_df["Profit"].sum()
 
-    pareto_df["Cumulative Profit %"] = (
-        (pareto_df["Cumulative Profit"] / total_profit) * 100
-        if total_profit != 0 else 0
-    )
+    if total_profit != 0:
+        pareto_df["Cumulative Profit %"] = (pareto_df["Cumulative Profit"] / total_profit) * 100
+    else:
+        pareto_df["Cumulative Profit %"] = 0
 
     return pareto_df
 
@@ -122,6 +122,12 @@ def cost_structure_analysis(df):
     cost_df["Pricing Issue"] = (
         (cost_df["Sales"] > cost_df["Sales"].mean()) &
         (cost_df["Profit"] < cost_df["Profit"].mean())
+    )
+
+    # FIX: Added missing Discontinue Review column
+    cost_df["Discontinue Review"] = (
+        (cost_df["Cost Ratio"] > 0.7) &
+        (cost_df["Sales"] < cost_df["Sales"].mean())
     )
 
     return cost_df
@@ -173,7 +179,7 @@ def apply_filters(df, division=None, margin_threshold=None, product_search=None)
 
     if margin_threshold is not None:
         filtered_df["Margin"] = filtered_df["Profit"] / filtered_df["Sales"]
-        filtered_df = filtered_df[filtered_df["Margin"] * 100 >= margin_threshold]
+        filtered_df = filtered_df[filtered_df["Margin"] >= margin_threshold]
 
     if product_search:
         filtered_df = filtered_df[
@@ -184,9 +190,9 @@ def apply_filters(df, division=None, margin_threshold=None, product_search=None)
 
 
 # ======================================
-# MAIN FUNCTION (IMPORTANT)
+# MAIN FUNCTION
 # ======================================
-def load_data():
-    df = load_and_clean_data()
+def load_data(filename="Nassau.csv"):
+    df = load_and_clean_data(filename)
     df = calculate_metrics(df)
     return df
