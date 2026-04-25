@@ -124,8 +124,8 @@ def cost_structure_analysis(df):
     cost_df["Low Margin"] = cost_df["Profit"] < cost_df["Profit"].mean()
 
     cost_df["Pricing Issue"] = (
-        (cost_df["Sales"] > cost_df["Sales"].mean()) &
-        (cost_df["Profit"] < cost_df["Profit"].mean())
+        (cost_df["Sales"] > cost_df["Sales"].median()) &
+        (cost_df["Profit"] < cost_df["Profit"].median())
     )
 
     cost_df["Discontinue Review"] = (
