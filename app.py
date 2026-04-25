@@ -4,7 +4,8 @@ import streamlit as st
 # PAGE CONFIG
 # =========================
 st.set_page_config(
-    page_title="Nassau Dashboard",
+    page_title="Nassau Candy Dashboard",
+    page_icon="🍬",
     layout="wide"
 )
 
@@ -28,11 +29,11 @@ Welcome to the **Product Line Profitability & Margin Performance Dashboard**.
 ---
 
 ### 📂 Navigate using the sidebar:
-- **Overview**
-- **Product Analysis**
-- **Division Performance**
-- **Cost Diagnostics**
-- **Profit Concentration**
+- **1 - Overview**
+- **2 - Product Analysis**
+- **3 - Division Performance**
+- **4 - Cost Diagnostics**
+- **5 - Profit Concentration**
 
 ---
 
@@ -52,4 +53,4 @@ All data cleaning, KPI calculations, and analytics logic are handled in:
 # FOOTER
 # =========================
 st.markdown("---")
-st.markdown("Developed for Data Analytics Project")
+st.markdown("Developed for Data Analytics Project | Nassau Candy Distributor")
