@@ -7,7 +7,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from data_processing import (
-    load_data,
+    load_and_clean_data,
+    calculate_metrics,
     calculate_kpis,
     apply_filters
 )
@@ -16,13 +17,13 @@ from data_processing import (
 # PAGE CONFIG
 # -----------------------------
 st.set_page_config(layout="wide")
-
 st.title("📊 Overview Dashboard")
 
 # -----------------------------
 # LOAD DATA
 # -----------------------------
-df = load_data("master.csv")
+df = load_and_clean_data()
+df = calculate_metrics(df)
 
 # -----------------------------
 # SIDEBAR FILTERS
@@ -38,7 +39,7 @@ division = st.sidebar.multiselect(
 margin_threshold = st.sidebar.slider(
     "Minimum Margin (%)",
     0, 100, 0
-)
+) / 100   # ✅ FIXED SCALE
 
 product_search = st.sidebar.text_input("Search Product")
 
@@ -72,32 +73,16 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("📦 Sales by Division")
-
     sales_div = filtered_df.groupby("Division")["Sales"].sum().reset_index()
 
-    fig1 = px.bar(
-        sales_div,
-        x="Division",
-        y="Sales",
-        color="Division",
-        template="plotly_dark"
-    )
-
+    fig1 = px.bar(sales_div, x="Division", y="Sales", color="Division", template="plotly_dark")
     st.plotly_chart(fig1, use_container_width=True)
 
 with col2:
     st.subheader("💰 Profit by Division")
-
     profit_div = filtered_df.groupby("Division")["Profit"].sum().reset_index()
 
-    fig2 = px.bar(
-        profit_div,
-        x="Division",
-        y="Profit",
-        color="Division",
-        template="plotly_dark"
-    )
-
+    fig2 = px.bar(profit_div, x="Division", y="Profit", color="Division", template="plotly_dark")
     st.plotly_chart(fig2, use_container_width=True)
 
 st.markdown("---")
@@ -109,15 +94,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("📊 Profit Distribution")
-
-    fig3 = px.histogram(
-        filtered_df,
-        x="Profit",
-        nbins=30,
-        color_discrete_sequence=["#00C9A7"],
-        template="plotly_dark"
-    )
-
+    fig3 = px.histogram(filtered_df, x="Profit", nbins=30, template="plotly_dark")
     st.plotly_chart(fig3, use_container_width=True)
 
 with col2:
@@ -131,15 +108,7 @@ with col2:
         .reset_index()
     )
 
-    fig4 = px.bar(
-        top_products,
-        x="Profit",
-        y="Product Name",
-        orientation="h",
-        color="Profit",
-        template="plotly_dark"
-    )
-
+    fig4 = px.bar(top_products, x="Profit", y="Product Name", orientation="h", template="plotly_dark")
     fig4.update_yaxes(categoryorder="total ascending")
 
     st.plotly_chart(fig4, use_container_width=True)
