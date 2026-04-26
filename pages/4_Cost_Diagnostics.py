@@ -21,91 +21,76 @@ st.set_page_config(layout="wide")
 # CUSTOM CSS
 # -----------------------------
 st.markdown("""
-<style>
-.stApp {
-    background: linear-gradient(135deg, #0f172a, #020617);
-    color: #e2e8f0;
-}
+    <style>
+    .stApp {
+        background-color: #1a1a2e;
+    }
 
-.page-header {
-    background: linear-gradient(135deg, #1e293b, #0f172a);
-    border-radius: 18px;
-    padding: 35px;
-    margin-bottom: 30px;
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.08);
-}
+    .page-header {
+        background: linear-gradient(120deg, #16213e, #0f3460);
+        border-radius: 16px;
+        padding: 30px 40px;
+        margin-bottom: 30px;
+        text-align: center;
+        border: 1px solid rgba(255,215,0,0.2);
+    }
 
-.kpi-card {
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 25px;
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.08);
-    transition: all 0.3s ease;
-}
+    .page-header h1 {
+        color: #FFD700;
+        font-size: 2.2em;
+        font-weight: 800;
+        margin: 0;
+    }
 
-.kpi-card:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
+    .page-header p {
+        color: #cccccc;
+        font-size: 1em;
+        margin-top: 6px;
+    }
 
-.kpi-label {
-    font-size: 0.75em;
-    color: #94a3b8;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
+    .section-title {
+        font-size: 1.2em;
+        font-weight: 700;
+        color: #FFD700;
+        margin: 25px 0 12px 0;
+        border-left: 5px solid #FFD700;
+        padding-left: 12px;
+    }
 
-.kpi-value {
-    font-size: 2em;
-    font-weight: 800;
-    color: #38bdf8;
-}
+    .info-box {
+        background: rgba(255,215,0,0.08);
+        border: 1px solid rgba(255,215,0,0.2);
+        border-radius: 12px;
+        padding: 16px 20px;
+        color: #cccccc;
+        font-size: 0.95em;
+    }
 
-.kpi-value-green {
-    color: #22c55e;
-}
-
-.kpi-value-red {
-    color: #ef4444;
-}
-
-.section-title {
-    font-size: 1.2em;
-    font-weight: 700;
-    color: #38bdf8;
-    margin: 25px 0 12px;
-    border-left: 4px solid #38bdf8;
-    padding-left: 10px;
-}
-
-.info-box {
-    background: rgba(56,189,248,0.08);
-    border-left: 4px solid #38bdf8;
-    padding: 15px;
-    border-radius: 10px;
-    color: #cbd5f5;
-    margin-top: 10px;
-}
-</style>
+    .warning-box {
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        border-radius: 12px;
+        padding: 16px 20px;
+        color: #ffaaaa;
+        font-size: 0.95em;
+    }
+    </style>
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# HEADER
+# PAGE HEADER
 # -----------------------------
 st.markdown("""
 <div class="page-header">
     <h1>💰 Cost vs Margin Diagnostics</h1>
-    <p>Identify inefficiencies, cost-heavy products, and pricing issues</p>
+    <p>Identify cost-heavy products, pricing inefficiencies and discontinuation candidates</p>
 </div>
 """, unsafe_allow_html=True)
 
 # -----------------------------
 # LOAD DATA
 # -----------------------------
-df = load_data()
+df = load_data("Nassau.csv")
 
 # -----------------------------
 # SIDEBAR FILTERS
@@ -123,8 +108,9 @@ margin_threshold = st.sidebar.slider(
     0, 100, 0
 ) / 100
 
-product_search = st.sidebar.text_input("Search Product")
+product_search = st.sidebar.text_input("🔍 Search Product")
 
+# Apply filters
 filtered_df = apply_filters(
     df,
     division=division,
@@ -138,40 +124,7 @@ filtered_df = apply_filters(
 cost_df = cost_structure_analysis(filtered_df)
 
 # -----------------------------
-# KPI SUMMARY
-# -----------------------------
-st.markdown('<div class="section-title">📌 Cost Diagnostics Summary</div>', unsafe_allow_html=True)
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">Pricing Issues</div>
-        <div class="kpi-value-red">{len(cost_df[cost_df["Pricing Issue"] == True])}</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">Cost Heavy</div>
-        <div class="kpi-value">{len(cost_df[cost_df["Cost Heavy"] == True])}</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col3:
-    st.markdown(f"""
-    <div class="kpi-card">
-        <div class="kpi-label">Discontinue Review</div>
-        <div class="kpi-value-green">{len(cost_df[cost_df["Discontinue Review"] == True])}</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("---")
-
-# -----------------------------
-# SCATTER PLOT
+# SCATTER: COST vs SALES
 # -----------------------------
 st.markdown('<div class="section-title">📊 Cost vs Sales Analysis</div>', unsafe_allow_html=True)
 
@@ -180,82 +133,60 @@ fig1 = px.scatter(
     x="Cost",
     y="Sales",
     color="Division",
-    size="Profit",
     hover_data=["Product Name"],
-    template="plotly_dark"
+    template="plotly_dark",
+    color_discrete_sequence=["#FFD700", "#ff6b6b", "#4ecdc4"],
+    labels={
+        "Cost": "Cost ($)",
+        "Sales": "Sales ($)"
+    }
 )
-
-fig1.update_traces(marker=dict(opacity=0.7))
 fig1.update_layout(
     paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)"
+    plot_bgcolor="rgba(255,255,255,0.03)",
 )
-
 st.plotly_chart(fig1, use_container_width=True)
-
-# -----------------------------
-# INSIGHT
-# -----------------------------
-if not cost_df.empty:
-    worst = cost_df.sort_values(by="Profit").iloc[0]
-
-    st.markdown(f"""
-    <div class="info-box">
-    ⚠️ <b>Insight:</b> <b>{worst['Product Name']}</b> is generating low profit. 
-    Consider reviewing pricing or reducing cost.
-    </div>
-    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
 # -----------------------------
-# PRICING ISSUES
+# PRICING ISSUE PRODUCTS
 # -----------------------------
-st.markdown('<div class="section-title">⚠️ Pricing Inefficiency</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">⚠️ Pricing Inefficiency — High Sales but Low Profit</div>', unsafe_allow_html=True)
 
 pricing_issue = cost_df[cost_df["Pricing Issue"] == True]
 
 if pricing_issue.empty:
-    st.info("No pricing inefficiency found.")
+    st.markdown('<div class="info-box">✅ No pricing inefficiency products found with current filters.</div>', unsafe_allow_html=True)
 else:
-    st.dataframe(
-        pricing_issue.sort_values(by="Sales", ascending=False),
-        use_container_width=True,
-        height=300
-    )
+    st.dataframe(pricing_issue, use_container_width=True)
 
 st.markdown("---")
 
 # -----------------------------
-# COST HEAVY
+# COST HEAVY PRODUCTS
 # -----------------------------
 st.markdown('<div class="section-title">🚨 Cost Heavy Products</div>', unsafe_allow_html=True)
 
 cost_heavy = cost_df[cost_df["Cost Heavy"] == True]
 
 if cost_heavy.empty:
-    st.info("No cost heavy products.")
+    st.markdown('<div class="info-box">✅ No cost heavy products found with current filters.</div>', unsafe_allow_html=True)
 else:
-    st.dataframe(
-        cost_heavy.sort_values(by="Cost Ratio", ascending=False),
-        use_container_width=True,
-        height=300
-    )
+    st.dataframe(cost_heavy, use_container_width=True)
 
 st.markdown("---")
 
 # -----------------------------
-# DISCONTINUE
+# DISCONTINUE SUGGESTION
 # -----------------------------
-st.markdown('<div class="section-title">❌ Discontinue Review</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">❌ Products for Discontinuation Review</div>', unsafe_allow_html=True)
 
 discontinue = cost_df[cost_df["Discontinue Review"] == True]
 
 if discontinue.empty:
-    st.info("No products flagged for discontinuation.")
+    st.markdown('<div class="info-box">✅ No products flagged for discontinuation with current filters.</div>', unsafe_allow_html=True)
 else:
-    st.dataframe(
-        discontinue.sort_values(by="Profit"),
-        use_container_width=True,
-        height=300
-    )
+    st.markdown('<div class="warning-box">⚠️ These products have high cost ratios and low sales. Consider repricing or discontinuing.</div>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.dataframe(discontinue, use_container_width=True)
